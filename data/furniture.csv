@@ -1,0 +1,7 @@
+name,color_r,color_g,color_b,image_url
+blackBed.png,104,99,95,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Bed/blackBed.png
+BlueBed.png,37,58,80,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Bed/BlueBed.png
+brownBed.png,33,36,41,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Bed/brownBed.png
+BlackChair.png,41,44,49,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Chair/BlackChair.png
+BlackSofa.png,34,59,84,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Sofa/BlackSofa.png
+BrownTable.png,40,59,79,https://vjjccowcihzsfomzkvug.supabase.co/storage/v1/object/public/furniture-images/Table/BrownTable.png
