@@ -1,47 +1,63 @@
-# room_classifier.py
-
 from PIL import Image
 import torchvision.transforms as transforms
 import torch
-import torchvision.models as models
+from torchvision.models import mobilenet_v2, MobileNet_V2_Weights
+import urllib.request
 
-# Load a pre-trained MobileNet model
-mobilenet = models.mobilenet_v2(pretrained=True)
+# Load model with weights
+weights = MobileNet_V2_Weights.DEFAULT
+mobilenet = mobilenet_v2(weights=weights)
 mobilenet.eval()
 
-# ImageNet index for room-like classes (simplified for demo)
-ROOM_CLASSES = {
-    532: 'studio_couch',
-    920: 'window_shade',
-    538: 'television',
-    420: 'lampshade',
-    511: 'refrigerator',
-    759: 'wardrobe',
-    746: 'table_lamp',
-    829: 'sofa',
-    832: 'studio_couch',
-    558: 'loupe',  # might overlap with room interior
-    814: 'room'    # actual room class
-}
+# Download ImageNet class labels
+LABELS_URL = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
+with urllib.request.urlopen(LABELS_URL) as f:
+    imagenet_classes = [line.decode('utf-8').strip() for line in f.readlines()]
 
+# Keywords to detect room-like scenes
+ROOM_KEYWORDS = [
+    'room', 'interior', 'bedroom', 'living room', 'dining room',
+    'hall', 'studio', 'indoor', 'lounge', 'apartment', 'office',
+    'ceiling', 'floor', 'wall', 'furniture', 'workspace', 'cubicle',
+    'desk', 'chair', 'carpet', 'curtain', 'window', 'light', 'lamp'
+]
+
+# Transform
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
     )
 ])
 
-def is_room_image(image_path: str) -> bool:
+def is_room_image(image_path: str, confidence_threshold=0.02, topk=8) -> bool:
+    """
+    Classify image as room if any top-k predictions match room-related keywords.
+    """
     try:
         image = Image.open(image_path).convert("RGB")
         image_tensor = transform(image).unsqueeze(0)
+
         with torch.no_grad():
-            output = mobilenet(image_tensor)
-            _, predicted = torch.max(output, 1)
-            pred_idx = predicted.item()
-            print(f"[DEBUG] Predicted class index: {pred_idx}")
-            return pred_idx in ROOM_CLASSES
+            outputs = mobilenet(image_tensor)
+            probs = torch.nn.functional.softmax(outputs[0], dim=0)
+
+        top_probs, top_indices = torch.topk(probs, topk)
+
+        print("\n[DEBUG] Predictions:")
+        for i in range(topk):
+            class_name = imagenet_classes[top_indices[i]]
+            prob = top_probs[i].item()
+            print(f" - {class_name}: {prob:.4f}")
+            if prob >= confidence_threshold:
+                for keyword in ROOM_KEYWORDS:
+                    if keyword in class_name.lower():
+                        return True
+
+        return False
+
     except Exception as e:
         print(f"[ERROR] Room detection failed: {e}")
         return False
