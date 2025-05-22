@@ -249,9 +249,9 @@ def recommend():
         image_file.save(image_path)
 
         # Check if it's a valid room image
-        if not is_room_image(image_path):
-            os.remove(image_path)
-            return jsonify({'error': 'Please upload a valid room photo (not object-only)'}), 400
+        # if not is_room_image(image_path):
+        #     os.remove(image_path)
+        #     return jsonify({'error': 'Please upload a valid room photo (not object-only)'}), 400
 
         # Recommend furniture
         recommendations = recommend_furniture(image_path, category)
