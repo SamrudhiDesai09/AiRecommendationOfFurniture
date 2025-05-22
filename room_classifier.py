@@ -75,9 +75,9 @@ mobilenet = mobilenet_v2(weights=weights)
 mobilenet.eval()
 
 # Download ImageNet class labels
-# LABELS_URL = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
-# with urllib.request.urlopen(LABELS_URL) as f:
-#     imagenet_classes = [line.decode('utf-8').strip() for line in f.readlines()]
+LABELS_URL = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
+with urllib.request.urlopen(LABELS_URL) as f:
+    imagenet_classes = [line.decode('utf-8').strip() for line in f.readlines()]
 
 with open("assets/imagenet_classes.txt", "r") as f:
     imagenet_classes = [line.strip() for line in f.readlines()]
